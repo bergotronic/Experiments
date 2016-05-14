@@ -1,0 +1,53 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+	# Configure base box parameters
+	config.vm.provider "hyperv" 
+
+
+	config.vm.define "LAB-Machine1" do |machine|
+    	#Machine / Windows Specific Configs
+    	machine.vm.box = "mwrock/Windows2012R2Full"
+    	machine.vm.guest = :windows	
+       	machine.vm.hostname = "LAB-Machine1"
+       	machine.vm.communicator = "winrm"
+		
+		#Disable Shared Folder Stuf
+       	machine.vm.synced_folder ".", "/vagrant", disabled: true, smb_password: "v" ,	smb_username: "v"
+       	machine.vm.synced_folder "src/", "/srv/website", disabled: true, smb_password: "v" ,	smb_username: "v"
+       	machine.vm.synced_folder ".", "/vagrant", type: "smb", disabled: true, smb_password: "v" ,	smb_username: "v"
+       	machine.vm.synced_folder "", "", disabled: true
+
+		# Port forward WinRM and RDP
+  		machine.vm.network :forwarded_port, guest: 3389, host: 3389
+  		machine.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
+  		
+  		# Run Provisioning PowerShell Script
+  		machine.vm.provision :shell, path: "POSHPROV.ps1"
+  		
+	end
+
+	config.vm.define "LAB-Machine2" do |machine|
+	   	#Machine / Windows Specific Configs
+    	machine.vm.box = "mwrock/Windows2012R2Full"
+    	machine.vm.guest = :windows	
+       	machine.vm.hostname = "LAB-Machine2"
+       	machine.vm.communicator = "winrm"
+
+       	#Disable Shared Folder Stuf
+       	machine.vm.synced_folder ".", "/vagrant", disabled: true, smb_password: "v" ,	smb_username: "v"
+       	machine.vm.synced_folder "src/", "/srv/website", disabled: true, smb_password: "v" ,	smb_username: "v"
+       	machine.vm.synced_folder ".", "/vagrant", type: "smb", disabled: true, smb_password: "v" ,	smb_username: "v"
+       	machine.vm.synced_folder "", "", disabled: true
+
+		# Port forward WinRM and RDP
+  		machine.vm.network :forwarded_port, guest: 3389, host: 3389
+  		machine.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
+  		
+  		# Run Provisioning PowerShell Script
+  		machine.vm.provision :shell, path: "POSHPROV.ps1"
+
+	end
+
+end
